@@ -3,49 +3,56 @@
 import { useState } from "react";
 import { zoningData } from "../data/zoningMock";
 import ZoningResult from "../components/ZoningResult";
+import ZoningMap from "../components/ZoningMap";
 
 export default function Home() {
-  const [city, setCity] = useState("");
-  const [useType, setUseType] = useState("");
-  const [result, setResult] = useState<any>(null);
+  const [city, setCity] = useState<string | null>(null);
+  const [useType, setUseType] = useState("Retail");
 
-  const handleSearch = () => {
-    if (zoningData[city]) {
-      setResult(zoningData[city]);
-    } else {
-      alert("City not in demo dataset");
-    }
-  };
+  const zoning = city ? zoningData[city] : null;
 
   return (
-    <main style={{ padding: 40 }}>
-      <h1>Commercial Zoning Research – Demo</h1>
+    <div style={{ display: "flex" }}>
+      <div style={{ flex: 2 }}>
+        <ZoningMap onCitySelect={setCity} />
+      </div>
 
-      <input
-        placeholder="City, State (e.g. Detroit, MI)"
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-        style={{ display: "block", marginBottom: 10 }}
-      />
-
-      <select
-        value={useType}
-        onChange={(e) => setUseType(e.target.value)}
-        style={{ display: "block", marginBottom: 10 }}
+      <div
+        style={{
+          flex: 1,
+          padding: 20,
+          background: "#fff",
+          borderLeft: "1px solid #ddd",
+          height: "100vh",
+          overflow: "auto",
+        }}
       >
-        <option value="">Select Use</option>
-        <option value="Retail">Retail</option>
-        <option value="Restaurant">Restaurant</option>
-        <option value="Gas Station">Gas Station</option>
-        <option value="Office">Office</option>
-        <option value="Medical">Medical</option>
-      </select>
+        <h2>Zoning Intelligence</h2>
 
-      <button onClick={handleSearch}>Run Zoning Check</button>
+        {city && (
+          <>
+            <p><strong>Selected City:</strong> {city}</p>
 
-      {result && useType && (
-        <ZoningResult city={city} use={useType} data={result} />
-      )}
-    </main>
+            <select
+              value={useType}
+              onChange={(e) => setUseType(e.target.value)}
+              style={{ marginBottom: 10 }}
+            >
+              <option value="Retail">Retail</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Gas Station">Gas Station</option>
+              <option value="Office">Office</option>
+              <option value="Medical">Medical</option>
+            </select>
+
+            {zoning && (
+              <ZoningResult city={city} use={useType} data={zoning} />
+            )}
+          </>
+        )}
+
+        {!city && <p>Click a city marker to begin.</p>}
+      </div>
+    </div>
   );
 }
